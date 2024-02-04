@@ -1,3 +1,4 @@
+# Import necessary libraries
 from quart import Quart, request, jsonify, abort
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -8,40 +9,47 @@ import datetime
 from dotenv import load_dotenv
 import os
 
-# Load environment variables
+# Load environment variables from a .env file for better security and configuration management
 load_dotenv()
 
+# Initialize Quart app
 app = Quart(__name__)
+
+# Initialize Notion client with an authentication token from environment variables
 notion = Client(auth=os.getenv("NOTION_TOKEN"))
 
-# Scopes required for Google Calendar access
+# Define the Google API scope needed for calendar access
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
+
 def get_calendar_service():
+    """Retrieve Google Calendar service object to interact with the API."""
     creds = None
-    # Check if token.json exists and load it
+    # Check if access token exists in 'token.json' for reuse
     if os.path.exists("token.json"):
         with open("token.json", "r") as token:
             creds = Credentials.from_authorized_user_file("token.json", SCOPES)
 
-    # If credentials are not available or are invalid, go through the flow.
+    # Refresh or obtain new credentials if necessary
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
             creds = flow.run_local_server(port=0)
-            # Save the credentials for the next run
             with open("token.json", "w") as token:
                 token.write(creds.to_json())
 
     service = build("calendar", "v3", credentials=creds)
     return service
 
+
 @app.route("/read_events", methods=["GET"])
 async def read_events():
+    """API endpoint to read events from a specified Google Calendar."""
     service = get_calendar_service()
 
+    # Retrieve query parameters with defaults
     calendar_id = request.args.get("calendar_id", "primary")
     time_min = request.args.get(
         "time_min", datetime.datetime.utcnow().isoformat() + "Z"
@@ -49,6 +57,7 @@ async def read_events():
     time_max = request.args.get("time_max", None)
 
     try:
+        # Call the Google Calendar API to list events
         events_result = (
             service.events()
             .list(
@@ -68,16 +77,19 @@ async def read_events():
 
 @app.route("/create_event", methods=["POST"])
 async def create_event():
+    """API endpoint to create a new event in a specified Google Calendar."""
     service = get_calendar_service()
     data = await request.get_json()
 
+    # Retrieve event details from request body
     calendar_id = data.get("calendar_id", "primary")
     summary = data.get("summary")
     description = data.get("description")
-    start_time = data.get("start_time")  # In RFC3339 format
-    end_time = data.get("end_time")  # In RFC3339 format
+    start_time = data.get("start_time")  # Expected in RFC3339 format
+    end_time = data.get("end_time")  # Expected in RFC3339 format
     attendees = data.get("attendees", [])  # List of attendee email addresses
 
+    # Validate required fields
     if not all([summary, start_time, end_time]):
         abort(400, description="Missing required event fields.")
 
@@ -90,6 +102,7 @@ async def create_event():
     }
 
     try:
+        # Call the Google Calendar API to create the event
         created_event = (
             service.events().insert(calendarId=calendar_id, body=event).execute()
         )
@@ -100,6 +113,7 @@ async def create_event():
 
 @app.route("/delete_event", methods=["DELETE"])
 async def delete_event():
+    """API endpoint to delete an event from a specified Google Calendar."""
     service = get_calendar_service()
 
     calendar_id = request.args.get("calendar_id", "primary")
@@ -109,6 +123,7 @@ async def delete_event():
         abort(400, description="Event ID is required.")
 
     try:
+        # Call the Google Calendar API to delete the event
         service.events().delete(calendarId=calendar_id, eventId=event_id).execute()
         return jsonify({"status": "success", "message": "Event deleted successfully"})
     except Exception as e:
