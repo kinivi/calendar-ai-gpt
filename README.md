@@ -2,7 +2,8 @@
 
 # Calendar-ai-gpt
 
-Calendar AI is a comprehensive solution designed to integrate Google Calendar and Notion, facilitating seamless synchronization and management of calendar events and Notion databases. This project enables users to read and create events in Google Calendar, manage Notion pages and databases, and perform a variety of actions to streamline their scheduling and note-taking processes.
+Calendar AI is a toolbox to create your time-managment assistant using CustomGPT funcitonality of ChatGPT Plus. It designed to integrate Google Calendar and Notion without any third-party apps.   
+This project enables users to read and create events in Google Calendar, manage Notion pages and databases, and perform a variety of actions to streamline their scheduling and note-taking processes.
 
 
 ## Features
