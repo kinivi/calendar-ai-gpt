@@ -1,5 +1,12 @@
 [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa] <img src="https://img.shields.io/badge/Python-3.10+-blue.svg" alt="Python 3.10+" />
 
+[![Medium](https://img.shields.io/badge/Medium-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://pub.towardsai.net/calendar-ai-tutorial-for-building-custom-chatgpt-with-google-and-notion-integrations-654519ea1577) 
+
+<hr>
+
+📖 [Check the Tutorial](https://medium.com/towards-artificial-intelligence/calendar-ai-tutorial-for-building-custom-chatgpt-with-google-and-notion-integrations-654519ea1577) 📖
+
+
 # Calendar-ai-gpt
 
 Calendar AI is a toolbox to create your time-managment assistant using CustomGPT funcitonality of ChatGPT Plus. It designed to integrate Google Calendar and Notion without any third-party apps.   
